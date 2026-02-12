@@ -15,7 +15,7 @@ def correr_ingestion_bronze(**context):
     timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
 
     # Referenciare el volumen de datos, ademas de crear un archivo que contenga la informacion por cada momento que se ejecute
-    path = path(f"/opt/airflow/data/vuelos_{timestamp}.json")
+    path = Path(f"/opt/airflow/data/vuelos_{timestamp}.json")
 
     with open(path,"w") as f:
         json.dump(data,f)

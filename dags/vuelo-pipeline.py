@@ -5,7 +5,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 
-AIRFLOW_HOME = PATH('/opt/airflow')
+AIRFLOW_HOME = Path('/opt/airflow')
 
 if str(AIRFLOW_HOME) not in sys.path:
     sys.path.insert(0, str(AIRFLOW_HOME))
