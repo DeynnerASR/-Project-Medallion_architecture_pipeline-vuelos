@@ -26,15 +26,15 @@ with DAG(
     schedule_interval = "*/30 * * * *",
     catchup = False,
 )as dag:
-    tarea_ingestion_bronze = PythonOperator(
+    task_ingestion_bronze = PythonOperator(
         task_id = "ingestion_bronze",
         python_callable = correr_ingestion_bronze
     )
 
-    tarea_transformacion_silver = PythonOperator(
+    task_transformacion_silver = PythonOperator(
         task_id = "transformacion_silver",
         python_callable = correr_transformacion_silver,
     )
 
-    # Indico las dependencia. Es decir, la tarea "silver", depende de la ejecucion exitosa de la tarea "bronze"
-    bronze >> silver
+    # Indico las dependencia. Es decir, la task "transformacion_silver", depende de la ejecucion exitosa de la task "ingestion_bronze"
+    task_ingestion_bronze >> task_transformacion_silver
