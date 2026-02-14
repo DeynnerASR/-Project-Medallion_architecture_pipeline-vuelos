@@ -5,14 +5,14 @@ from pathlib import Path
 
 def correr_transformacion_silver(**context):
 
-    fecha_ejecucion = context("ds_nodash")
+    fecha_ejecucion = context["ds_nodash"]
 
     silver_path = Path(f"/opt/airflow/data/silver")
-    silver_path.mkdir(parent=True, exist_ok=True)
+    silver_path.mkdir(parents=True, exist_ok=True)
 
 
     # Extraere el archivo de la capa bronze, usando un xcom de la tarea anterior de Airflow
-    ultimo_archivo_bronze = context["ti"].xcom_pull(key="bronze_file", task_ids="bronze_ingest")
+    ultimo_archivo_bronze = context["ti"].xcom_pull(key="bronze_file", task_ids="ingestion_bronze")
 
     if not ultimo_archivo_bronze:
         raise ValueError("No se encontró el archivo de la capa bronze")
@@ -40,8 +40,7 @@ def correr_transformacion_silver(**context):
             "geo_altitude",
             "squawk",
             "spi",
-            "position_source",
-            "category"
+            "position_source"
         ]
 
         df_limpio = df_raw[
