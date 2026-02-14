@@ -18,7 +18,8 @@ services:
       retries: 5
 
   airflow-init:
-    image: apache/airflow:2.9.3
+    build: .
+    image: airflow-custom:2.9.3
     container_name: airflow-init
     depends_on:
       postgres:
@@ -32,16 +33,18 @@ services:
     command: >
       -c "
       airflow db migrate &&
-      airflow users create --username ${AIRFLOW_ADMIN_USER} --firstname ${AIRFLOW_ADMIN_FIRSTNAME} --lastname ${AIRFLOW_ADMIN_LASTNAME} --role Admin --email ${AIRFLOW_ADMIN_EMAIL} --password ${AIRFLOW_ADMIN_PASSWORD} || true &&
+      airflow users create --username ${AIRFLOW_ADMIN_USER} --firstname ${AIRFLOW_ADMIN_FIRSTNAME} --lastname ${AIRFLOW_ADMIN_LASTNAME} --role Admin --email ${AIRFLOW_ADMIN_EMAIL} --password ${AIRFLOW_ADMIN_PASSWORD} 2>/dev/null || echo 'Admin user already exists' &&
       echo '✅ Airflow DB initialized successfully.'
       "
 
   airflow-webserver:
-    image: apache/airflow:2.9.3
+    build: .
+    image: airflow-custom:2.9.3
     container_name: airflow-webserver
     restart: always
     depends_on:
-      - airflow-init
+      postgres:
+        condition: service_healthy
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
@@ -63,14 +66,16 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 40s
+      start_period: 120s
 
   airflow-scheduler:
-    image: apache/airflow:2.9.3
+    build: .
+    image: airflow-custom:2.9.3
     container_name: airflow-scheduler
     restart: always
     depends_on:
-      - airflow-init
+      postgres:
+        condition: service_healthy
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
