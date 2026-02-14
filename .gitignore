@@ -1,4 +1,5 @@
 .env
+/logs/
 /logs/scheduler/
 config/
 /dags/__pycache__/
