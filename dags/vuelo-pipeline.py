@@ -22,7 +22,7 @@ with DAG(
     dag_id= "vuelos_pipeline",
     default_args = default_args,
     start_date = datetime(2025,2,2),
-    schedule_interval = "/30 * * * *",
+    schedule_interval = "*/30 * * * *",
     catchup = False,
 )as dag:
     tarea_ingestion_bronze = PythonOperator(
