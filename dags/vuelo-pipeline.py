@@ -12,6 +12,8 @@ if str(AIRFLOW_HOME) not in sys.path:
 
 from scripts.bronze_ingest import correr_ingestion_bronze
 from scripts.silver_transform import correr_transformacion_silver
+from scripts.gold_aggregate import correr_aggregate_gold  
+from scripts.load_goldData_to_snowflake import cargar_gold_layer_snowflake
 
 default_args = {
     "owner":"airflow",
@@ -36,5 +38,13 @@ with DAG(
         python_callable = correr_transformacion_silver,
     )
 
-    # Indico las dependencia. Es decir, la task "transformacion_silver", depende de la ejecucion exitosa de la task "ingestion_bronze"
-    task_ingestion_bronze >> task_transformacion_silver
+    task_agregación_gold = PythonOperator(
+        task_id = "agregacion_gold",
+        python_callable = correr_aggregate_gold,
+    )
+
+    task_cargar_data_snowflake = PythonOperator(
+        task_id = "load_gold_to_snowflake",
+        python_callable = cargar_gold_layer_snowflake,
+    ),
+    task_ingestion_bronze >> task_transformacion_silver >> task_agregación_gold >> task_cargar_data_snowflake # Indico las dependencia. Es decir, la task "transformacion_silver", depende de la ejecucion exitosa de la task "ingestion_bronze"
