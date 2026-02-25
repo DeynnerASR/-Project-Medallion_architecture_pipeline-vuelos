@@ -17,6 +17,8 @@ def cargar_gold_layer_snowflake(**context):
 
     df = pd.read_csv(gold_file)
 
+    print(df.head())
+
     conn = BaseHook.get_connection("flight_snowflake")
     
     sf_conn = snowflake.connector.connect(
@@ -35,7 +37,7 @@ def cargar_gold_layer_snowflake(**context):
     ## FLIGHT_KPIS tabla destino
 
     merge_sql = """
-        MERGE INTO FLIGHT_KPIS tgt
+        MERGE INTO FLIGHT_KPI tgt
         USING (
                 SELECT 
                     TO_TIMESTAMP(%s) AS WINDOW_START,
@@ -44,18 +46,17 @@ def cargar_gold_layer_snowflake(**context):
                     %s AS VELOCIDAD_PROMEDIO,
                     %s AS EN_TIERRA
             ) src
-                ON tgt.WINDOW_START = src.WINDOW_START 
-                AND tgt.PAIS = src.PAIS
-                WHEN MATCHED THEN
-                    UPDATE SET
-                        CANTIDAD_DE_VUELOS = src.CANTIDAD_DE_VUELOS,
-                        VELOCIDAD_PROMEDIO = src.VELOCIDAD_PROMEDIO,
-                        EN_TIERRA = src.EN_TIERRA,
-                        LOAD_TIME = CURRENT_TIMESTAMP()
-                WHEN NOT MATCHED THEN
-                    INSERT (WINDOW_START, PAIS, CANTIDAD_DE_VUELOS, VELOCIDAD_PROMEDIO, EN_TIERRA, LOAD_TIME)
-                    VALUES (src.WINDOW_START, src.PAIS, src.CANTIDAD_DE_VUELOS, src.VELOCIDAD_PROMEDIO, src.EN_TIERRA, CURRENT_TIMESTAMP())
-    )    
+        ON tgt.WINDOW_START = src.WINDOW_START 
+           AND tgt.PAIS = src.PAIS
+        WHEN MATCHED THEN
+            UPDATE SET
+                CANTIDAD_DE_VUELOS = src.CANTIDAD_DE_VUELOS,
+                VELOCIDAD_PROMEDIO = src.VELOCIDAD_PROMEDIO,
+                EN_TIERRA = src.EN_TIERRA,
+                LOAD_TIME = CURRENT_TIMESTAMP()
+        WHEN NOT MATCHED THEN
+            INSERT (CANTIDAD_DE_VUELOS, EN_TIERRA,LOAD_TIME,PAIS, VELOCIDAD_PROMEDIO,WINDOW_START)
+            VALUES (src.CANTIDAD_DE_VUELOS,src.EN_TIERRA,CURRENT_TIMESTAMP(),src.PAIS,src.VELOCIDAD_PROMEDIO,src.WINDOW_START)
     """
 
     ## ejecuto las queries anteriormente instanciadas, usando el dataframe de la capa agregada gold
