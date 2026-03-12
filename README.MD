@@ -2,8 +2,9 @@
 
 
 ## DIAGRAMA
-
-
+<div align="center">
+  <h1>Título Centrado</h1>
+</div>
 ## TECNOLOGIAS
 
 
