@@ -7,7 +7,12 @@
 
 
 ## TECNOLOGIAS
-
+- Python Pandas
+- Apache Airflow
+- Snowflake connector
+- Looker Studio
+- OpenSky Network API
+- Medallion Architecture
 
 ## INICIALIZACIÓN
 1. Clona el repositorio:
