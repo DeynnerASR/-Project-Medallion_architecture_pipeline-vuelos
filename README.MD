@@ -7,6 +7,7 @@
 
 
 ## TECNOLOGIAS
+- Docker 
 - Python Pandas
 - Apache Airflow
 - Snowflake connector
